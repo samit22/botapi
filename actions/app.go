@@ -43,8 +43,10 @@ func App() *buffalo.App {
 		//  c.Value("tx").(*pop.PopTransaction)
 		// Remove to disable this.
 		app.Use(middleware.PopTransaction(models.DB))
-
-		app.GET("/", HomeHandler)
+		g := app.Group("/api/v1")
+		// g.Use(APIAuthorizer)
+		g.GET("/", HomeHandler)
+		g.GET("/person" , GetPersonInfo)
 
 	}
 
