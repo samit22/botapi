@@ -59,7 +59,7 @@ func App() *buffalo.App {
 // Middleware to Authorize Token Based Request
 func AuthorizeRequest(next buffalo.Handler) buffalo.Handler {
   return func(c buffalo.Context) error {
-    token := c.Param("token")
+    token := c.Request().Header.Get("API-TOKEN")
     if token == os.Getenv("APP_TOKEN") {
       return next(c)
     } else {
