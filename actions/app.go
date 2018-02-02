@@ -1,6 +1,7 @@
 package actions
 
 import (
+  "os"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
@@ -43,6 +44,8 @@ func App() *buffalo.App {
 		//  c.Value("tx").(*pop.PopTransaction)
 		// Remove to disable this.
 		app.Use(middleware.PopTransaction(models.DB))
+    app.Use(AuthorizeRequest)
+
 		g := app.Group("/api/v1")
 		// g.Use(APIAuthorizer)
 		g.GET("/", HomeHandler)
@@ -51,4 +54,16 @@ func App() *buffalo.App {
 	}
 
 	return app
+}
+
+// Middleware to Authorize Token Based Request
+func AuthorizeRequest(next buffalo.Handler) buffalo.Handler {
+  return func(c buffalo.Context) error {
+    token := c.Request().Header.Get("API-TOKEN")
+    if token == os.Getenv("APP_TOKEN") {
+      return next(c)
+    } else {
+      return c.Render(404, r.JSON(map[string]string{"message": "UnAuthorized Token"}))
+    }
+  }
 }
